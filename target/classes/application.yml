@@ -54,8 +54,9 @@ app:
 security:
   crypto:
     secret: veryStrongSecretKey123456789
+
   bcrypt:
-    strength: 12ф
+    strength: 12
 
 springdoc:
   swagger-ui:
