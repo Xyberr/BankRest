@@ -16,7 +16,7 @@ public class CryptoUtil {
 
     private final SecretKeySpec keySpec;
 
-    public CryptoUtil(@Value("${app.crypto.secret}") String secret) {
+    public CryptoUtil(@Value("${security.crypto.secret}") String secret) {
         byte[] key = secret.substring(0, 16).getBytes(StandardCharsets.UTF_8);
         this.keySpec = new SecretKeySpec(key, ALGO);
     }

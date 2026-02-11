@@ -15,7 +15,7 @@ import java.util.List;
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String password;
@@ -30,4 +30,7 @@ public class User extends BaseEntity {
             orphanRemoval = true
     )
     private List<Card> cards = new ArrayList<>();
+
+    @Column(nullable = false, unique = true)
+    private String email;
 }
