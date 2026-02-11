@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Component
-@RequiredArgsConstructor
 public class CryptoUtil {
 
     private static final String ALGO = "AES";
