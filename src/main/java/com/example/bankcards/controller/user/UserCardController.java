@@ -1,0 +1,35 @@
+package com.example.bankcards.controller.user;
+
+import com.example.bankcards.dto.card.CardResponseDTO;
+import com.example.bankcards.service.cardService.ICardService;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/user/cards")
+@RequiredArgsConstructor
+public class UserCardController {
+
+    private final ICardService cardService;
+
+    @GetMapping("/{userId}")
+    public Page<CardResponseDTO> myCards(
+            @PathVariable @NotNull Long userId,
+            Pageable pageable
+    ) {
+        return cardService.getUserCards(userId, pageable);
+    }
+
+    @PostMapping("/{cardId}/request-block")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void requestBlock(
+            @RequestParam Long userId,
+            @PathVariable Long cardId
+    ) {
+        cardService.requestBlock(userId, cardId);
+    }
+}

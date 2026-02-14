@@ -2,16 +2,18 @@ package com.example.bankcards.entity;
 
 import com.example.bankcards.entity.enums.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)

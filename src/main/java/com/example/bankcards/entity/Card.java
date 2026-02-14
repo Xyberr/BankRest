@@ -10,19 +10,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(
-        name = "cards",
-        indexes = {
-                @Index(name = "idx_card_owner", columnList = "owner_id")
-        }
-)
+@Table(name = "cards", indexes = {@Index(name = "idx_card_owner", columnList = "owner_id")})
 @Getter
 @Setter
 public class Card extends BaseEntity {
 
     @Convert(converter = CardNumberConverter.class)
     @Column(nullable = false, length = 512)
-    private String number; // В ENTITY всегда расшифрованный
+    private String number;
 
     @Column(nullable = false)
     private LocalDate expiry;
