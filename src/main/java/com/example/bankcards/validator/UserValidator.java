@@ -11,6 +11,5 @@ public class UserValidator {
         if (dto.getPassword().length() < 8) {
             throw new BadRequestException("Password must be at least 8 characters");
         }
-        // можно добавить кастомную проверку уникальности email и username
     }
 }
