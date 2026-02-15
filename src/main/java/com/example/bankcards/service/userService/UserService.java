@@ -10,6 +10,7 @@ import com.example.bankcards.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +22,20 @@ public class UserService implements IUserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final UserValidator validator;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
 
-        validator.validate(dto);
+        if (repository.existsByPhoneNumber(dto.getPhoneNumber())) {
+            throw new RuntimeException("Phone number already exists");
+        }
 
-        User saved = repository.save(mapper.toEntity(dto));
+        User user = mapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        User saved = repository.save(user);
 
         return mapper.toDto(saved);
     }

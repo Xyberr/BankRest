@@ -1,6 +1,20 @@
 package com.example.bankcards.dto.auth;
 
-public record AuthRequest(
-        String email,
-        String password
-) {}
+import jakarta.validation.constraints.NotBlank;
+
+public class AuthRequest {
+
+    @NotBlank
+    private String phoneNumber;
+
+    @NotBlank
+    private String password;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
