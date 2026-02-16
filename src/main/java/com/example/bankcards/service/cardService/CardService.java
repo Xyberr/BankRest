@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -38,7 +39,7 @@ public class CardService implements ICardService {
         card.setNumber(CardNumberUtil.generate());
         card.setExpiry(LocalDate.now().plusYears(3));
         card.setStatus(CardStatus.ACTIVE);
-        card.setBalance(MoneyUtil.normalize(card.getBalance()));
+        card.setBalance(MoneyUtil.normalize(BigDecimal.ZERO));
 
         Card saved = cardRepository.save(card);
 

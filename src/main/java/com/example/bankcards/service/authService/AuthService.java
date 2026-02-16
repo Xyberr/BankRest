@@ -43,7 +43,7 @@ public class AuthService implements IAuthService {
         }
 
         User user = User.builder()
-                .email(request.getPhoneNumber())
+                .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
@@ -52,7 +52,7 @@ public class AuthService implements IAuthService {
 
         return new AuthResponse(
                 user.getId(),
-                user.getEmail(),
+                user.getPhoneNumber(),
                 user.getRole().name()
         );
     }

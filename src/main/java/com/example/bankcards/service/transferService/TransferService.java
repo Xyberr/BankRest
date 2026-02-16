@@ -82,7 +82,7 @@ public class TransferService implements ITransferService {
             throw new IllegalStateException("Card is not active");
         }
 
-        if (card.getExpiry().isBefore(LocalDate.now())) {
+        if (card.getExpiry().isBefore(LocalDate.now(clock))) {
             card.setStatus(CardStatus.EXPIRED);
             throw new IllegalStateException("Card expired");
         }

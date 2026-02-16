@@ -28,10 +28,6 @@ public class UserService implements IUserService {
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
 
-        if (repository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new RuntimeException("Phone number already exists");
-        }
-
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
