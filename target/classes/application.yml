@@ -51,9 +51,9 @@ app:
 
 
 
-security:
-  crypto:
-    secret: veryStrongSecretKey123456789
+
+crypto:
+  secret: veryStrongSecretKey123456789
 
   bcrypt:
     strength: 12
