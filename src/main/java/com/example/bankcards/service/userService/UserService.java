@@ -3,6 +3,7 @@ package com.example.bankcards.service.userService;
 import com.example.bankcards.dto.user.UserRequestDTO;
 import com.example.bankcards.dto.user.UserResponseDTO;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.UserMapper;
 import com.example.bankcards.repository.UserRepository;
@@ -25,8 +26,13 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
+
+        validator.validate(dto);
+
+        if (repository.existsByPhoneNumber(dto.getPhoneNumber())) {
+            throw new BadRequestException("Phone number already in use");
+        }
 
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
