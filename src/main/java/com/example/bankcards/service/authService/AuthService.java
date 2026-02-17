@@ -22,7 +22,7 @@ public class AuthService implements IAuthService {
     public AuthResponse login(AuthRequest request) {
 
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BadRequestException("Invalid credentials");
@@ -30,7 +30,7 @@ public class AuthService implements IAuthService {
 
         return new AuthResponse(
                 user.getId(),
-                user.getEmail(),
+                user.getPhoneNumber(),
                 user.getRole().name()
         );
     }
@@ -44,16 +44,17 @@ public class AuthService implements IAuthService {
 
         User user = User.builder()
                 .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
         return new AuthResponse(
-                user.getId(),
-                user.getPhoneNumber(),
-                user.getRole().name()
+                saved.getId(),
+                saved.getPhoneNumber(),
+                saved.getRole().name()
         );
     }
 }

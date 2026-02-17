@@ -10,6 +10,11 @@ public class AuthRequest {
     @NotBlank
     private String password;
 
+    @NotBlank
+    private String email;
+
+    public String getEmail() {return email;}
+
     public String getPhoneNumber() {
         return phoneNumber;
     }

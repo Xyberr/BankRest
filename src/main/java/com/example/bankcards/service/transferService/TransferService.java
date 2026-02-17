@@ -4,6 +4,7 @@ package com.example.bankcards.service.transferService;
 import com.example.bankcards.dto.transfer.TransferRequest;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Transfer;
+import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.exception.ForbiddenException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.util.MoneyUtil;
@@ -33,7 +34,7 @@ public class TransferService implements ITransferService {
     public void transferBetweenOwnCards(TransferRequest request) {
 
         if (request.getFromCardId().equals(request.getToCardId())) {
-            throw new IllegalArgumentException("Cannot transfer to same card");
+            throw new BadRequestException("Cannot transfer to same card");
         }
 
         Card from = findCard(request.getFromCardId());
@@ -46,7 +47,7 @@ public class TransferService implements ITransferService {
         var amount = MoneyUtil.normalize(request.getAmount());
 
         if (from.getBalance().compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient funds");
+            throw new BadRequestException("Insufficient funds");
         }
 
         from.setBalance(MoneyUtil.normalize(from.getBalance().subtract(amount)));
@@ -56,7 +57,6 @@ public class TransferService implements ITransferService {
         transfer.setFromCard(from);
         transfer.setToCard(to);
         transfer.setAmount(amount);
-        transfer.setCreatedAt(Instant.now(clock));
         transfer.setStatus(TransferStatus.SUCCESS);
 
         transferRepository.save(transfer);
@@ -79,12 +79,12 @@ public class TransferService implements ITransferService {
     private void validateCardState(Card card) {
 
         if (card.getStatus() != CardStatus.ACTIVE) {
-            throw new IllegalStateException("Card is not active");
+            throw new BadRequestException("Card is not active");
         }
 
         if (card.getExpiry().isBefore(LocalDate.now(clock))) {
             card.setStatus(CardStatus.EXPIRED);
-            throw new IllegalStateException("Card expired");
+            throw new BadRequestException("Card expired");
         }
     }
 }

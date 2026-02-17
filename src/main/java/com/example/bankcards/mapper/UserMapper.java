@@ -12,9 +12,9 @@ public class UserMapper {
 
     public User toEntity(UserRequestDTO dto) {
         User user = new User();
-        user.setEmail(dto.getPhoneNumber());
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setPassword(dto.getPassword()); // кодирование делаем в сервисе
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword()); // кодируется в сервисе
         user.setRole(Role.USER);
         return user;
     }

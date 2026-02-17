@@ -4,6 +4,7 @@ import com.example.bankcards.dto.card.CardResponseDTO;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.entity.enums.CardStatus;
+import com.example.bankcards.exception.ForbiddenException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.CardMapper;
 import com.example.bankcards.repository.CardRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 
 
@@ -24,9 +26,11 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Transactional
 public class CardService implements ICardService {
+
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper mapper;
+    private final Clock clock;
 
     @Override
     public CardResponseDTO createCard(Long userId) {
@@ -37,7 +41,7 @@ public class CardService implements ICardService {
         Card card = new Card();
         card.setOwner(owner);
         card.setNumber(CardNumberUtil.generate());
-        card.setExpiry(LocalDate.now().plusYears(3));
+        card.setExpiry(LocalDate.now(clock).plusYears(3));
         card.setStatus(CardStatus.ACTIVE);
         card.setBalance(MoneyUtil.normalize(BigDecimal.ZERO));
 
@@ -81,7 +85,7 @@ public class CardService implements ICardService {
         Card card = findCard(cardId);
 
         if (!card.getOwner().getId().equals(userId)) {
-            throw new SecurityException("Access denied");
+            throw new ForbiddenException("Access denied");
         }
 
         card.setStatus(CardStatus.BLOCKED);
