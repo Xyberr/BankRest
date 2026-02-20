@@ -1,7 +1,9 @@
 package com.example.bankcards.dto.auth;
 
 public record AuthResponse(
-        Long id,
+        Long userId,
         String phoneNumber,
-        String role
+        String role,
+        String accessToken,
+        String refreshToken
 ) {}

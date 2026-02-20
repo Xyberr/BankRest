@@ -5,17 +5,19 @@ import com.example.bankcards.dto.auth.AuthResponse;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.entity.enums.Role;
 import com.example.bankcards.exception.BadRequestException;
-import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -28,10 +30,15 @@ public class AuthService implements IAuthService {
             throw new BadRequestException("Invalid credentials");
         }
 
+        String accessToken = jwtService.generateAccessToken(user.getPhoneNumber());
+        String refreshToken = jwtService.generateRefreshToken(user.getPhoneNumber());
+
         return new AuthResponse(
                 user.getId(),
                 user.getPhoneNumber(),
-                user.getRole().name()
+                user.getRole().name(),
+                accessToken,
+                refreshToken
         );
     }
 
@@ -51,10 +58,15 @@ public class AuthService implements IAuthService {
 
         User saved = userRepository.save(user);
 
+        String accessToken = jwtService.generateAccessToken(saved.getPhoneNumber());
+        String refreshToken = jwtService.generateRefreshToken(saved.getPhoneNumber());
+
         return new AuthResponse(
                 saved.getId(),
                 saved.getPhoneNumber(),
-                saved.getRole().name()
+                saved.getRole().name(),
+                accessToken,
+                refreshToken
         );
     }
 }
