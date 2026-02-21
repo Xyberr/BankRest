@@ -43,11 +43,10 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
-app:
-    jwt:
-      secret: Fl9MYfBjNsWs2oIq8gX2OmR3ribKPSJhoWvdkshvv53ohvLEATA9Sz+UcJ8OVksVRJEmAIhYLAF1AhyEY5VdXQ==
-      access-token-expiration: 3600000        # 1h (ms)
-      refresh-token-expiration: 604800000     # 7d
+jwt:
+  secret: Fl9MYfBjNsWs2oIq8gX2OmR3ribKPSJhoWvdkshvv53ohvLEATA9Sz+UcJ8OVksVRJEmAIhYLAF1AhyEY5VdXQ==
+  access-token-expiration: 3600000        # 1h (ms)
+  refresh-token-expiration: 604800000     # 7d
 
 
 
