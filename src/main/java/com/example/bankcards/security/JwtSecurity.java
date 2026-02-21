@@ -1,30 +1,24 @@
 package com.example.bankcards.security;
 
-import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.security.Key;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtSecurity {
 
     @Value("${jwt.secret}")
     private String secret;
@@ -84,5 +78,14 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public LocalDateTime getRefreshExpirationDate() {
+        return LocalDateTime.now()
+                .plus(Duration.ofMillis(refreshTokenExpiration));
+    }
+
+    public Instant getRefreshExpirationInstant() {
+        return Instant.now().plusMillis(refreshTokenExpiration);
     }
 }
