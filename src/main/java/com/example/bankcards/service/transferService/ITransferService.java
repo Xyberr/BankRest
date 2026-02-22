@@ -4,5 +4,5 @@ import com.example.bankcards.dto.transfer.TransferRequest;
 
 public interface ITransferService {
 
-    void transferBetweenOwnCards(TransferRequest request);
+    void transferBetweenOwnCards(TransferRequest request, Long currentUserId);
 }

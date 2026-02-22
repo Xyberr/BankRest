@@ -1,25 +1,24 @@
 package com.example.bankcards.service.transferService;
 
-
 import com.example.bankcards.dto.transfer.TransferRequest;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Transfer;
+import com.example.bankcards.entity.enums.CardStatus;
+import com.example.bankcards.entity.enums.TransferStatus;
 import com.example.bankcards.exception.BadRequestException;
 import com.example.bankcards.exception.ForbiddenException;
+import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.repository.CardRepository;
+import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.util.MoneyUtil;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.entity.enums.CardStatus;
-import com.example.bankcards.entity.enums.TransferStatus;
-import com.example.bankcards.repository.TransferRepository;
 
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Instant;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -31,39 +30,46 @@ public class TransferService implements ITransferService {
     private final Clock clock;
 
     @Override
-    public void transferBetweenOwnCards(TransferRequest request) {
+    public void transferBetweenOwnCards(TransferRequest request, Long currentUserId) {
 
         if (request.getFromCardId().equals(request.getToCardId())) {
             throw new BadRequestException("Cannot transfer to same card");
         }
 
-        Card from = findCard(request.getFromCardId());
-        Card to = findCard(request.getToCardId());
+        BigDecimal amount = MoneyUtil.normalize(request.getAmount());
 
-        validateOwnership(request.getUserId(), from, to);
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Invalid amount");
+        }
+
+        Card from = findCardForUpdate(request.getFromCardId());
+        Card to = findCardForUpdate(request.getToCardId());
+
+        validateOwnership(currentUserId, from, to);
         validateCardState(from);
         validateCardState(to);
 
-        var amount = MoneyUtil.normalize(request.getAmount());
-
         if (from.getBalance().compareTo(amount) < 0) {
+            saveFailedTransfer(from, to, amount);
             throw new BadRequestException("Insufficient funds");
         }
 
-        from.setBalance(MoneyUtil.normalize(from.getBalance().subtract(amount)));
-        to.setBalance(MoneyUtil.normalize(to.getBalance().add(amount)));
+        from.debit(amount);
+        to.credit(amount);
 
-        Transfer transfer = new Transfer();
-        transfer.setFromCard(from);
-        transfer.setToCard(to);
-        transfer.setAmount(amount);
-        transfer.setStatus(TransferStatus.SUCCESS);
+        Transfer transfer = Transfer.builder()
+                .fromCard(from)
+                .toCard(to)
+                .amount(amount)
+                .status(TransferStatus.SUCCESS)
+                .createdAt(Instant.now(clock))
+                .build();
 
         transferRepository.save(transfer);
     }
 
-    private Card findCard(Long id) {
-        return cardRepository.findById(id)
+    private Card findCardForUpdate(Long id) {
+        return cardRepository.findByIdForUpdate(id)
                 .orElseThrow(() ->
                         new NotFoundException("Card not found: " + id));
     }
@@ -86,5 +92,18 @@ public class TransferService implements ITransferService {
             card.setStatus(CardStatus.EXPIRED);
             throw new BadRequestException("Card expired");
         }
+    }
+
+    private void saveFailedTransfer(Card from, Card to, BigDecimal amount) {
+
+        Transfer transfer = Transfer.builder()
+                .fromCard(from)
+                .toCard(to)
+                .amount(amount)
+                .status(TransferStatus.FAILED)
+                .createdAt(Instant.now(clock))
+                .build();
+
+        transferRepository.save(transfer);
     }
 }

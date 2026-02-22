@@ -9,9 +9,6 @@ import java.math.BigDecimal;
 public class TransferRequest {
 
     @NotNull
-    private Long userId;
-
-    @NotNull
     private Long fromCardId;
 
     @NotNull
@@ -20,10 +17,6 @@ public class TransferRequest {
     @NotNull
     @DecimalMin(value = "0.01")
     private BigDecimal amount;
-
-    public Long getUserId() {
-        return userId;
-    }
 
     public Long getFromCardId() {
         return fromCardId;
