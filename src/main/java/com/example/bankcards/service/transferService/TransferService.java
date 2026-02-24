@@ -1,6 +1,7 @@
 package com.example.bankcards.service.transferService;
 
 import com.example.bankcards.dto.transfer.TransferRequest;
+import com.example.bankcards.dto.transfer.TransferResponse;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Transfer;
 import com.example.bankcards.entity.enums.CardStatus;
@@ -12,9 +13,11 @@ import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.util.MoneyUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Pageable;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Instant;
@@ -92,6 +95,20 @@ public class TransferService implements ITransferService {
             card.setStatus(CardStatus.EXPIRED);
             throw new BadRequestException("Card expired");
         }
+    }
+
+    @Override
+    public Page<TransferResponse> getUserTransfers(Long userId, Pageable pageable) {
+
+        return transferRepository.findAllByUserId(userId, pageable)
+                .map(t -> new TransferResponse(
+                        t.getId(),
+                        t.getFromCard().getId(),
+                        t.getToCard().getId(),
+                        t.getAmount(),
+                        t.getStatus(),
+                        t.getCreatedAt()
+                ));
     }
 
     private void saveFailedTransfer(Card from, Card to, BigDecimal amount) {
